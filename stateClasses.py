@@ -8,5 +8,6 @@ class bot_ans(StatesGroup):
     user_id=State()
     ans=State()
 
-class answer(StatesGroup):
+class AnswerState(StatesGroup):
+    user_id = State()
     take_response = State()

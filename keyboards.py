@@ -11,9 +11,11 @@ kb_main_reg = ReplyKeyboardMarkup(resize_keyboard=True)
 kb_main_reg_1 = KeyboardButton('Регистрация')
 kb_main_reg_2 = KeyboardButton('Подробнее о цикле лекций')
 kb_main_reg_3 = KeyboardButton('Обратная связь')
-kb_main_reg_4 = KeyboardButton('Пропуска')
-kb_main_reg.add(kb_main_reg_2, kb_main_reg_3).add(kb_main_reg_1, kb_main_reg_4)
+# kb_main_reg_4 = KeyboardButton('Пропуска')
+kb_main_reg.add(kb_main_reg_2, kb_main_reg_3).add(kb_main_reg_1)
 
+kb_main_admin = ReplyKeyboardMarkup(resize_keyboard=True)
+kb_main_admin.add(KeyboardButton('Ответить на вопросы'))
 
 kb_info = ReplyKeyboardMarkup(resize_keyboard=True)
 kb_info_1 = KeyboardButton('1) Операционные системы')
@@ -60,9 +62,6 @@ kb_day6_1 = KeyboardButton('Композиционный анализ сторо
 kb_day6_2 = KeyboardButton('Безопасность инфраструктур под управлением Kubernetes')
 kb_day6_3 = KeyboardButton('Назад')
 kb_day6.add(kb_day6_1).add(kb_day6_2).add(kb_day6_3)
-
-
-
 
 
 kb_feedback_aprove = ReplyKeyboardMarkup(resize_keyboard=True)
