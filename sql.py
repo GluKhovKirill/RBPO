@@ -82,18 +82,18 @@ def create_table_feedback():
         cur = con.cursor()
         try:
             cur.execute(
-                f"CREATE TABLE feedback (`uid` INT NOT NULL, `mess_id` BIGINT NULL, `asked` TEXT NULL, `quest` TEXT NULL, PRIMARY KEY (`uid`))")
+                f"CREATE TABLE feedback (`uid` INT NOT NULL AUTO_INCREMENT, `mess_id` BIGINT NULL, `asked` TEXT NULL, `quest` TEXT NULL, PRIMARY KEY (`uid`))")
         except:
             print('Table is exist')
 
-
+create_table_feedback()
 def create_table_main():
     con = pymysql.connect(host=host, user=user, password=password, database=d_name)
     with con:
         cur = con.cursor()
         try:
             cur.execute(
-                f"CREATE TABLE main (`uid` INT NOT NULL, `tg_id` BIGINT NOT NULL, `day` TEXT NOT NULL, `qr` TEXT NOT NULL, PRIMARY KEY (`uid`))")
+                f"CREATE TABLE main (`uid` INT NOT NULL AUTO_INCREMENT, `tg_id` BIGINT NOT NULL, `day` TEXT NOT NULL, `qr` TEXT NOT NULL, PRIMARY KEY (`uid`))")
         except:
             print('Table is exist')
 
@@ -104,7 +104,7 @@ def create_table_admins():
         cur = con.cursor()
         try:
             cur.execute(
-                f"CREATE TABLE admins (`uid` INT NOT NULL, `tg_id` BIGINT NOT NULL, PRIMARY KEY (`uid`))")
+                f"CREATE TABLE admins (`uid` INT NOT NULL AUTO_INCREMENT, `tg_id` BIGINT NOT NULL, PRIMARY KEY (`uid`))")
         except:
             print('Table is exist')
 
@@ -115,7 +115,7 @@ def create_table_from_gmail():
             cur = con.cursor()
             try:
                 cur.execute(
-                    f"CREATE TABLE from_gmail (`uid` INT NOT NULL, `form_id` BIGINT NOT NULL, `surname` TEXT NOT NULL, `name` TEXT NOT NULL, `otchestvo` TEXT NOT NULL, `day` TEXT NOT NULL, `org` TEXT NOT NULL, `mail` TEXT NOT NULL, `tg` TEXT NOT NULL, PRIMARY KEY (`uid`))")
+                    f"CREATE TABLE from_gmail (`uid` INT NOT NULL AUTO_INCREMENT, `form_id` BIGINT NOT NULL, `surname` TEXT NOT NULL, `name` TEXT NOT NULL, `otchestvo` TEXT NOT NULL, `day` TEXT NOT NULL, `org` TEXT NOT NULL, `mail` TEXT NOT NULL, `tg` TEXT NOT NULL, PRIMARY KEY (`uid`))")
             except:
                 print('Table is exist')
 
@@ -126,7 +126,7 @@ def create_table_questions():
         cur = con.cursor()
         try:
             cur.execute(
-                f"CREATE TABLE questions (`uid` INT NOT NULL, `form_id` BIGINT NOT NULL, `quest` TEXT NOT NULL, `status` TINYINT NULL, `answer` TEXT  NULL, PRIMARY KEY (`uid`))")
+                f"CREATE TABLE questions (`uid` INT NOT NULL AUTO_INCREMENT, `form_id` BIGINT NOT NULL, `quest` TEXT NOT NULL, `status` TINYINT NULL, `answer` TEXT  NULL, PRIMARY KEY (`uid`))")
         except:
             print('Table is exist')
 
