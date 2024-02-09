@@ -86,7 +86,7 @@ def create_table_feedback():
         except:
             print('Table is exist')
 
-create_table_feedback()
+
 def create_table_main():
     con = pymysql.connect(host=host, user=user, password=password, database=d_name)
     with con:
