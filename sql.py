@@ -126,7 +126,7 @@ def create_table_questions():
         cur = con.cursor()
         try:
             cur.execute(
-                f"CREATE TABLE questions (`uid` INT NOT NULL AUTO_INCREMENT, `form_id` BIGINT NOT NULL, `quest` TEXT NOT NULL, `status` TINYINT NULL, `answer` TEXT  NULL, PRIMARY KEY (`uid`))")
+                f"CREATE TABLE questions (`uid` INT NOT NULL AUTO_INCREMENT, `tg_id` BIGINT NOT NULL, `quest` TEXT NOT NULL, `status` TINYINT NULL, `answer` TEXT  NULL, PRIMARY KEY (`uid`))")
         except:
             print('Table is exist')
 
