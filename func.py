@@ -27,8 +27,6 @@ def qr_maker(tg_id, day):
     return name
 
 
-
-
 def from_gmail_catcher():
     print("Checking mail for forms")
     global MAIL_CHECK_TIMER
