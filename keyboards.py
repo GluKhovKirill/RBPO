@@ -1,5 +1,4 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 kb_main = ReplyKeyboardMarkup(resize_keyboard=True)
 kb_main_1 = KeyboardButton('Регистрация')
@@ -7,12 +6,11 @@ kb_main_2 = KeyboardButton('Подробнее о цикле лекций')
 kb_main_3 = KeyboardButton('Обратная связь')
 kb_main.add(kb_main_2, kb_main_3).add(kb_main_1)
 
-kb_main_reg = ReplyKeyboardMarkup(resize_keyboard=True)
-kb_main_reg_1 = KeyboardButton('Регистрация')
-kb_main_reg_2 = KeyboardButton('Подробнее о цикле лекций')
-kb_main_reg_3 = KeyboardButton('Обратная связь')
-# kb_main_reg_4 = KeyboardButton('Пропуска')
-kb_main_reg.add(kb_main_reg_2, kb_main_reg_3).add(kb_main_reg_1)
+# kb_main_reg = ReplyKeyboardMarkup(resize_keyboard=True)
+# kb_main_reg_1 = KeyboardButton('Регистрация')
+# kb_main_reg_2 = KeyboardButton('Подробнее о цикле лекций')
+# kb_main_reg_3 = KeyboardButton('Обратная связь')
+# kb_main_reg.add(kb_main_reg_2, kb_main_reg_3).add(kb_main_reg_1)
 
 kb_main_admin = ReplyKeyboardMarkup(resize_keyboard=True)
 kb_main_admin.add(KeyboardButton('Ответить на вопросы'))

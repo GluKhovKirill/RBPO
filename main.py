@@ -1,16 +1,16 @@
 from aiogram import Bot, Dispatcher, types, executor
-from aiogram.types import InputFile
+from aiogram.types import InputFile, ReplyKeyboardRemove
 from config import token
 from func import from_gmail_catcher
-from keyboards import kb_main, kb_info, kb_main_reg, kb_feedback_aprove
+from keyboards import kb_main, kb_info
 from keyboards import kb_day1, kb_day2, kb_day3, kb_day4, kb_day5, kb_day6
 from keyboards import kb_main_admin
 from aiogram.dispatcher.filters import Text
-from sql import reg_checker, qr_sender
+from sql import qr_sender
 from stateClasses import FeedbackState, AnswerState
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
-from sql import admin_catcher, quest_insert, answer_caughter,answer_collect
+from sql import admin_catcher, quest_insert, answer_caughter, answer_collect
 from sql import take_gmail_user, create_table_main, create_table_feedback, create_db
 from sql import create_table_admins, create_table_from_gmail, create_table_questions
 from tenacity import retry, wait_random
@@ -37,9 +37,7 @@ async def start_comm(message: types.Message):
     '''
     if message.from_id in admin_catcher():
         await bot.send_message(message.from_id, 'Приветствую, тебя админ!', reply_markup=kb_main_admin)
-    elif reg_checker(message.from_id):
-        await bot.send_message(message.from_id, text, reply_markup=kb_main_reg, parse_mode="HTML")
-    elif not reg_checker(message.from_id):
+    else:
         await bot.send_message(message.from_id, text, reply_markup=kb_main, parse_mode="HTML")
 
 
@@ -68,16 +66,11 @@ async def day1(message: types.Message):
 ❗<u>«Операционные системы на основе ядра Linux: сообщество, дистрибутив, жизненный цикл»</u> от ООО «Базальт СПО» 
 -<u>«Микроядерные операционные системы. Summa Technologiae»</u> от АО «Лаборатория Касперского» 
 """
-    #TODO: добавить во все 6 разделов нормальные фотки
-    # photo = InputFile('images/day1.jpg')
-    # await bot.send_photo(message.from_id, photo=photo)
     await bot.send_message(message.from_id, text, reply_markup=kb_day1, parse_mode="HTML")
 
 
 @dp.message_handler(Text(equals='2) Системы управления базами данных'))
 async def day2(message: types.Message):
-    # photo = InputFile('images/day2.jpg')
-    # await bot.send_photo(message.from_id, photo=photo)
     text = """
 <b>Система управления базами данных</b> – большая тема второго тематического дня, который пройдет в 4-ую неделю марта и объединит две лекции: 
 ❗<u>«Тема уточняется»</u> от ООО «Постгрес Профессиональный» / «Postgres Professional» 
@@ -88,8 +81,6 @@ async def day2(message: types.Message):
 
 @dp.message_handler(Text(equals='3) Виртуализация и контейнеризация'))
 async def day3(message: types.Message):
-    # photo = InputFile('images/day3.jpg')
-    # await bot.send_photo(message.from_id, photo=photo)
     text = """
 <b>Виртуализация и контейнеризация</b> – большая тема третьего тематического дня, который пройдет во 2-ую неделю апреля и объединит две лекции: 
 ❗<u>«Контейнеризация и виртуализация - вчера, сегодня, завтра»</u> от «YADRO» 
@@ -100,8 +91,6 @@ async def day3(message: types.Message):
 
 @dp.message_handler(Text(equals='4) Интерпретаторы'))
 async def day4(message: types.Message):
-    # photo = InputFile('images/day4.jpg')
-    # await bot.send_photo(message.from_id, photo=photo)
     text = """
 <b>Интерпретаторы</b> – большая тема четвертого тематического дня, который пройдет в 4-ую неделю апреля и объединит две лекции: 
 ❗<u>«Java VM - внутренний мир виртуальной машины, проблемы JIT компиляции и сборки мусора, организация процесса безопасной разработки ПО»</u> от «Axiom JDK» 
@@ -117,8 +106,6 @@ async def day5(message: types.Message):
 ❗<u>«Тема уточняется»</u> от ФСТЭК России
 ❗<u>«Тема уточняется»</u> от ИСП РАН 
 """
-    # photo = InputFile('images/day5.jpg')
-    # await bot.send_photo(message.from_id, photo=photo)
     await bot.send_message(message.from_id, text, reply_markup=kb_day5, parse_mode="HTML")
 
 
@@ -129,8 +116,6 @@ async def day6(message: types.Message):
 ❗<u>«Безопасное использование Open Source»</u> от ООО «Профископ» / «CodeScoring»
 ❗<u>«Безопасность инфраструктур под управлением оркестратора Kubernetes»</u> от ООО «КлаудРан» / «Luntry»
     """
-    # photo = InputFile('images/day6.jpg')
-    # await bot.send_photo(message.from_id, photo=photo)
     await bot.send_message(message.from_id, text, reply_markup=kb_day6, parse_mode="HTML")
 
 
@@ -324,6 +309,9 @@ async def day6_2(message: types.Message):
 📚 <b><u>Тема</u></b>:
 ➡️ Безопасность инфраструктур под управлением оркестратора Kubernetes.
 
+📟 <b><u>Краткое описание</u></b>:
+➡️ ️‍ Лекция рассмотрит тему оркестрации контейнеров и оркестратор Kubernetes, даст возможность посмотреть как на устрйство данной системы, так и на ее безопасность и безопасность контейнеров под ее управлением.
+
 ‼️ <b><u>Начало</u></b>: Время уточняется‼️    
 """
     await bot.send_message(message.from_id, text, parse_mode="html")
@@ -335,18 +323,17 @@ async def register(message: types.Message):
     user = message.from_user.username
     data = take_gmail_user(user)
     if data:
-
         await bot.send_message(message.from_id, 'Вы зарегистрированы на следующие события:')
         data = [f'День {i}\n' for i in sorted(data, key=lambda x: x.split('. ')[0])]
         print(data)
         for i in data:
             mess += f'{i}\n'
         await bot.send_message(message.from_id, mess)
-        await bot.send_message(message.from_id, 'Если Вы хотите зарегистрировать на новое событие:\nhttps://forms.yandex.ru/u/65ba63fbeb61460b91183250/', reply_markup=kb_main_reg)
+        await bot.send_message(message.from_id, 'Если Вы хотите зарегистрировать на новое событие:\nhttps://forms.yandex.ru/u/65ba63fbeb61460b91183250/', reply_markup=kb_main)
     # qr_name = qr_maker(message.from_id, 'test')
     # users_register(message.from_id, 'test_day', qr_name)
     else:
-        await bot.send_message(message.from_id, 'Вы еще не регистрировались на наши события, пора это исправить, ссылка на регистрацию:\nhttps://forms.yandex.ru/u/65ba63fbeb61460b91183250/', reply_markup=kb_main_reg)
+        await bot.send_message(message.from_id, 'Вы еще не регистрировались на наши события, пора это исправить, ссылка на регистрацию:\nhttps://forms.yandex.ru/u/65ba63fbeb61460b91183250/', reply_markup=kb_main)
 
 
 @dp.message_handler(Text(equals='Пропуска'))
@@ -361,22 +348,19 @@ async def passer(message: types.Message):
 
 @dp.message_handler(Text(equals='Обратная связь'))
 async def callback(message: types.Message, state: FSMContext):
-    await bot.send_message(message.from_id, '❗Для того чтобы задать вопрос нажмите на <b>«Задать вопрос»</b> на клавиатуре. ', reply_markup=kb_feedback_aprove, parse_mode="HTML")
-
-
-@dp.message_handler(Text(equals='Задать вопрос'))
-async def callback_d(message: types.Message):
-    await bot.send_message(message.from_id, 'Введите Ваш вопрос, наша группа поддержки оперативно ответит Вам!',
-                           reply_markup=kb_feedback_aprove)
+    await bot.send_message(message.from_id, 'Введите Ваш вопрос!\n📛Для того чтобы отменить данный процесс нажмите /cancel', parse_mode="HTML", reply_markup=ReplyKeyboardRemove())
     await FeedbackState.take_quest.set()
 
 
 @dp.message_handler(state=FeedbackState.take_quest)
 async def feedback_sender(message: types.Message, state: FSMContext):
+    if message.text == '/cancel':
+        await state.finish()
+        await bot.send_message(message.from_id, 'Вы вышли из режима «Обратная связь»!', reply_markup=kb_main)
+        return
     quest_insert(message.text, message.from_id)
-    await bot.send_message(message.from_id, 'Ваш вопрос отправлен! Ожидайте ответ', reply_markup= kb_main_reg)
+    await bot.send_message(message.from_id, 'Ваш вопрос отправлен! Ожидайте ответ', reply_markup= kb_main)
     await state.finish()
-
 
 
 @dp.message_handler(Text(equals='Ответить на вопросы'))
