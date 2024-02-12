@@ -7,10 +7,13 @@ from bs4 import BeautifulSoup
 import json
 from sql import gmail_catcher
 from threading import Timer
+from sql import quest_checker
 
 
 MAIL_CHECK_TIMER = None
 MAIL_CHECK_DELAY = 30
+DB_CHECK_TIMER = None
+DB_CHECK_DELAY = 5
 def qr_maker(tg_id, day):
     name = f'qr_{tg_id}.png'
     version, level, qr_name = amzqr.run(
@@ -56,5 +59,17 @@ def from_gmail_catcher():
                     gmail_catcher(form_id.strip(), form_data.get('Фамилия','').strip(), form_data.get('Имя', '').strip(), form_data.get('Отчество', '').strip(), i.strip(), form_data.get('Учебная группа / Организация', '').strip(), form_data.get('Ваша почта', '').strip(), tg_id)
     MAIL_CHECK_TIMER = Timer(MAIL_CHECK_DELAY, from_gmail_catcher)
     MAIL_CHECK_TIMER.start()
+
+
+def quest_frame_checker():
+    data = quest_checker()
+    global DB_CHECK_TIMER
+    if DB_CHECK_TIMER:
+        DB_CHECK_TIMER.cancel()
+    if data != 0:
+        return f'Подъехали новые вопросы: {data}\nПора отвечать❗'
+
+    DB_CHECK_TIMER = Timer(DB_CHECK_DELAY, quest_frame_checker)
+    DB_CHECK_TIMER.start()
 
 

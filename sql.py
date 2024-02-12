@@ -126,7 +126,7 @@ def create_table_questions():
         cur = con.cursor()
         try:
             cur.execute(
-                f"CREATE TABLE questions (`uid` INT NOT NULL AUTO_INCREMENT, `tg_id` BIGINT NOT NULL, `quest` TEXT NOT NULL, `status` TINYINT NULL, `answer` TEXT  NULL, PRIMARY KEY (`uid`))")
+                f"CREATE TABLE questions (`uid` INT NOT NULL AUTO_INCREMENT, `tg_id` BIGINT NOT NULL, `quest` TEXT NOT NULL, `status` TINYINT NULL, `answer` TEXT  NULL, `temp_ans` BIGINT NULL, PRIMARY KEY (`uid`))")
         except:
             print('Table is exist')
 
@@ -151,14 +151,18 @@ def quest_insert(mess, tg_id):
         con.commit()
 
 
-def answer_caughter():
+def answer_caughter(tg_id):
     con = pymysql.connect(host=host, user=user, password=password, database=d_name)
     with con:
         cur = con.cursor()
         cur.execute(f'SELECT * FROM `questions` WHERE `status` is NULL')
-        quest = cur.fetchone()
-        user_quest = {'tg_id': quest[1], 'quest': quest[2], 'uid': quest[0]}
-    return user_quest
+        quests = cur.fetchall()
+        for i in quests:
+            if i[-1] == tg_id or i[-1] == None:
+                user_quest = {'tg_id': i[1], 'quest': i[2], 'uid': i[0], 'temp': i[-1]}
+                cur.execute(f"UPDATE `questions` SET `temp_ans`= {tg_id} WHERE `uid` = {i[0]} and `temp_ans` is NULL")
+                con.commit()
+                return user_quest, user_quest['temp']
 
 
 def answer_collect(uid, ans):
@@ -190,4 +194,16 @@ def take_gmail_user(username):
         except:
             days = []
     return days
+
+
+def quest_checker():
+    counter = 0
+    con = pymysql.connect(host=host, user=user, password=password, database=d_name)
+    with con:
+        cur = con.cursor()
+        cur.execute(f"SELECT `uid`FROM `questions` WHERE `status` is NULL and `temp_ans` is NULL")
+        dataframe = cur.fetchall()
+        for i in dataframe:
+            counter += 1
+    return counter
 

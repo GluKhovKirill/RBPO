@@ -340,7 +340,7 @@ async def passer(message: types.Message):
 
 @dp.message_handler(Text(equals='Обратная связь'))
 async def callback(message: types.Message, state: FSMContext):
-    await bot.send_message(message.from_id, 'Вы попали в раздел обратной связи', reply_markup=kb_feedback_aprove)
+    await bot.send_message(message.from_id, '❗Для того чтобы задать вопрос нажмите на <b>«Задать вопрос»</b> на клавиатуре. ', reply_markup=kb_feedback_aprove, parse_mode="HTML")
 
 
 @dp.message_handler(Text(equals='Задать вопрос'))
@@ -360,18 +360,25 @@ async def feedback_sender(message: types.Message, state: FSMContext):
 
 @dp.message_handler(Text(equals='Ответить на вопросы'))
 async def answering(message: types.Message, state: FSMContext):
-    quest_text = answer_caughter()
-    mess = f"""
+    try:
+        quest_text, id = answer_caughter(message.from_id)
+        if id == message.from_id or id == None:
+                    mess = f"""
 👩‍🎓Автор вопроса: {quest_text['tg_id']}
 
 ❓Вопрос: {quest_text['quest']}
 
 ❗Введите ответ на вопрос:
-    """
-    await bot.send_message(message.from_id, mess, reply_markup=kb_main_admin)
-    await state.update_data(user_id=quest_text['tg_id'])
-    await state.update_data(uid=quest_text['uid'])
-    await AnswerState.take_response.set()
+        """
+                    await bot.send_message(message.from_id, mess, reply_markup=kb_main_admin)
+                    await state.update_data(user_id=quest_text['tg_id'])
+                    await state.update_data(uid=quest_text['uid'])
+                    await AnswerState.take_response.set()
+        else:
+            await bot.send_message(message.from_id, 'На подобранный Вам вопрос уже отвечают, вопспользуйтесь кнопкой <b>«Ответить на вопросы»</b> на клавиатуре.', parse_mode='HTML')
+
+    except:
+        await bot.send_message(message.from_id, 'Актуальных вопросов нет!')
 
 
 @dp.message_handler(state=AnswerState.take_response)
