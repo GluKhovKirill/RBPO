@@ -72,7 +72,7 @@ async def day1(message: types.Message):
 @dp.message_handler(Text(equals='2) Системы управления базами данных'))
 async def day2(message: types.Message):
     text = """
-<b>Система управления базами данных</b> – большая тема второго тематического дня, который пройдет в 4-ую неделю марта и объединит две лекции: 
+<b>Системы управления базами данных</b> – большая тема второго тематического дня, который пройдет в 4-ую неделю марта и объединит две лекции: 
 ❗<u>«Тема уточняется»</u> от ООО «Постгрес Профессиональный» / «Postgres Professional» 
 ❗<u>«Реляционные базы данных и их роль при построении безопасных информационных систем»</u> от ООО «Ред Софт» 
     """
@@ -119,7 +119,7 @@ async def day6(message: types.Message):
     await bot.send_message(message.from_id, text, reply_markup=kb_day6, parse_mode="HTML")
 
 
-@dp.message_handler(Text(equals='Ядро операционной системы "Linux"'))
+@dp.message_handler(Text(equals='Операционные системы на основе ядра Linux'))
 async def day1_1(message: types.Message):
     text = """
 👩‍💻 <b><u>Докладчик</u></b>:
@@ -136,7 +136,7 @@ async def day1_1(message: types.Message):
     await bot.send_message(message.from_id, text, parse_mode="html")
 
 
-@dp.message_handler(Text(equals='Микроядерная операционная система KasperskyOS'))
+@dp.message_handler(Text(equals='Микроядерные операционные системы. Summa Technologiae'))
 async def day1_2(message: types.Message):
     text = '''
 👩‍💻 <b><u>Докладчики</u></b>:
@@ -161,14 +161,14 @@ async def day2_1(message: types.Message):
 ➡️ Иван Евгеньевич Панченко (заместитель генерального директора <b>ООО «Постгрес Профессиональный» / «Postgres Professional»</b>).
 
 📚 <b><u>Тема</u></b>:
-➡️ Системы управления базами данных.
+➡️ Тема уточняется 🔎
 
 ‼️ <b><u>Начало</u></b>: Время уточняется‼️      
 '''
     await bot.send_message(message.from_id, text, parse_mode="html")
 
 
-@dp.message_handler(Text(equals='Системы управления базами данных в "Linux"'))
+@dp.message_handler(Text(equals='Реляционные БД и их роль при построении безопасных ИС'))
 async def day2_2(message: types.Message):
     text = """
 👩‍💻 <b><u>Докладчик</u></b>:
@@ -185,7 +185,7 @@ async def day2_2(message: types.Message):
     await bot.send_message(message.from_id, text, parse_mode="html")
 
 
-@dp.message_handler(Text(equals='Системы виртуализации и контейнеризации'))
+@dp.message_handler(Text(equals='Контейнеризация и виртуализация - вчера, сегодня, завтра'))
 async def day3_1(message: types.Message):
     text = """
 👩‍💻 <b><u>Докладчик</u></b>:
@@ -217,11 +217,12 @@ async def day3_2(message: types.Message):
     await bot.send_message(message.from_id, text, parse_mode="html")
 
 
-@dp.message_handler(Text(equals='JVM Internals'))
+@dp.message_handler(Text(equals='Java VM - внутренний мир виртуальной машины'))
 async def day4_1(message: types.Message):
     text = """
-👩‍💻 <b><u>Докладчик</u></b>:
-➡️ Александр Дроздов (руководитель проектов <b>«Axiom JDK»</b>).
+👩‍💻 <b><u>Докладчики</u></b>:
+➡️ Александр Сергеевич Дроздов (руководитель проектов <b>«Axiom JDK»</b>).
+➡️ Содокладчик уточняется 🔎
 
 📚 <b><u>Тема</u></b>:
 ➡️ Java VM - внутреннее устройство и принципы работы.
@@ -231,7 +232,7 @@ async def day4_1(message: types.Message):
     await bot.send_message(message.from_id, text, parse_mode="html")
 
 
-@dp.message_handler(Text(equals='Интерпретатор Python'))
+@dp.message_handler(Text(equals='Python - история создания, основные идеи и механизмы'))
 async def day4_2(message: types.Message):
     text = """
 👩‍💻 <b><u>Докладчик</u></b>:
@@ -255,7 +256,7 @@ async def day4_2(message: types.Message):
     await bot.send_message(message.from_id, text, parse_mode="html")
 
 
-@dp.message_handler(Text(equals='Системы сертификации СЗИ ФСТЭК России'))
+@dp.message_handler(Text(equals='В.С. Лютиков (ФСТЭК России)'))
 async def day5_1(message: types.Message):
     text = """
 👩‍💻 <b><u>Докладчик</u></b>:
@@ -269,7 +270,7 @@ async def day5_1(message: types.Message):
     await bot.send_message(message.from_id, text, parse_mode="html")
 
 
-@dp.message_handler(Text(equals='Технологические центры безопасности ядра "Linux"'))
+@dp.message_handler(Text(equals='Академик РАН А.И.Аветисян (ИСП РАН)'))
 async def day5_2(message: types.Message):
     text = """
 👩‍💻 <b><u>Докладчик</u></b>:
@@ -283,7 +284,7 @@ async def day5_2(message: types.Message):
     await bot.send_message(message.from_id, text, parse_mode="html")
 
 
-@dp.message_handler(Text(equals='Композиционный анализ сторонних компонентов'))
+@dp.message_handler(Text(equals='Безопасное использование Open Source'))
 async def day6_1(message: types.Message):
     text = """
 👩‍💻 <b><u>Докладчик</u></b>:
@@ -344,7 +345,6 @@ async def passer(message: types.Message):
         await bot.send_message(message.from_id, f'{message.from_user.username}, Ваш пропуск на лекцию "пупуппупуп"')
         await bot.send_photo(message.from_id, photo=photo)
 
-#-1002007643494
 
 @dp.message_handler(Text(equals='Обратная связь'))
 async def callback(message: types.Message, state: FSMContext):
