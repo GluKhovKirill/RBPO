@@ -1,3 +1,5 @@
+import os
+
 from aiogram import Bot, Dispatcher, types, executor
 from aiogram.types import InputFile, ReplyKeyboardRemove
 from config import token
@@ -10,11 +12,11 @@ from sql import qr_sender
 from stateClasses import FeedbackState, AnswerState
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
-from sql import admin_catcher, quest_insert, answer_caughter, answer_collect
+from sql import admin_catcher, quest_insert, answer_caughter, answer_collect, unloading
 from sql import take_gmail_user, create_table_main, create_table_feedback, create_db
 from sql import create_table_admins, create_table_from_gmail, create_table_questions
 from tenacity import retry, wait_random
-
+from datetime import datetime
 
 bot = Bot(token=token)
 dp = Dispatcher(bot, storage=MemoryStorage())
@@ -25,6 +27,7 @@ async def error_handler(event):
     print(f'Critical error caused by {event.exception}')
     return True
 '''
+
 
 @dp.message_handler(commands=['start'])
 @dp.message_handler(Text(equals='Стоп'))
@@ -56,7 +59,9 @@ async def info(message: types.Message):
 
 @dp.message_handler(Text(equals='Назад'))
 async def back_info(message: types.Message):
-    await bot.send_message(message.from_id,'Весь цикл лекций разбит на 6 дней, чтобы прочитать подробнее о каждом, пользуйтесь кнопками', reply_markup=kb_info)
+    await bot.send_message(message.from_id,
+                           'Весь цикл лекций разбит на 6 дней, чтобы прочитать подробнее о каждом, пользуйтесь кнопками',
+                           reply_markup=kb_info)
 
 
 @dp.message_handler(Text(equals='1) Операционные системы'))
@@ -330,11 +335,15 @@ async def register(message: types.Message):
         for i in data:
             mess += f'{i}\n'
         await bot.send_message(message.from_id, mess)
-        await bot.send_message(message.from_id, 'Если Вы хотите зарегистрировать на новое событие:\nhttps://forms.yandex.ru/u/65ba63fbeb61460b91183250/', reply_markup=kb_main)
+        await bot.send_message(message.from_id,
+                               'Если Вы хотите зарегистрировать на новое событие:\nhttps://forms.yandex.ru/u/65ba63fbeb61460b91183250/',
+                               reply_markup=kb_main)
     # qr_name = qr_maker(message.from_id, 'test')
     # users_register(message.from_id, 'test_day', qr_name)
     else:
-        await bot.send_message(message.from_id, 'Вы еще не регистрировались на наши события, пора это исправить, ссылка на регистрацию:\nhttps://forms.yandex.ru/u/65ba63fbeb61460b91183250/', reply_markup=kb_main)
+        await bot.send_message(message.from_id,
+                               'Вы еще не регистрировались на наши события, пора это исправить, ссылка на регистрацию:\nhttps://forms.yandex.ru/u/65ba63fbeb61460b91183250/',
+                               reply_markup=kb_main)
 
 
 @dp.message_handler(Text(equals='Пропуска'))
@@ -348,7 +357,9 @@ async def passer(message: types.Message):
 
 @dp.message_handler(Text(equals='Обратная связь'))
 async def callback(message: types.Message, state: FSMContext):
-    await bot.send_message(message.from_id, 'Введите Ваш вопрос!\n📛Для того чтобы отменить данный процесс нажмите /cancel', parse_mode="HTML", reply_markup=ReplyKeyboardRemove())
+    await bot.send_message(message.from_id,
+                           'Введите Ваш вопрос!\n📛Для того чтобы отменить данный процесс нажмите /cancel',
+                           parse_mode="HTML", reply_markup=ReplyKeyboardRemove())
     await FeedbackState.take_quest.set()
 
 
@@ -359,7 +370,7 @@ async def feedback_sender(message: types.Message, state: FSMContext):
         await bot.send_message(message.from_id, 'Вы вышли из режима «Обратная связь»!', reply_markup=kb_main)
         return
     quest_insert(message.text, message.from_id)
-    await bot.send_message(message.from_id, 'Ваш вопрос отправлен! Ожидайте ответ', reply_markup= kb_main)
+    await bot.send_message(message.from_id, 'Ваш вопрос отправлен! Ожидайте ответ', reply_markup=kb_main)
     await state.finish()
 
 
@@ -368,22 +379,34 @@ async def answering(message: types.Message, state: FSMContext):
     try:
         quest_text, id = answer_caughter(message.from_id)
         if id == message.from_id or id == None:
-                    mess = f"""
+            mess = f"""
 👩‍🎓Автор вопроса: {quest_text['tg_id']}
 
 ❓Вопрос: {quest_text['quest']}
 
 ❗Введите ответ на вопрос:
         """
-                    await bot.send_message(message.from_id, mess, reply_markup=kb_main_admin)
-                    await state.update_data(user_id=quest_text['tg_id'])
-                    await state.update_data(uid=quest_text['uid'])
-                    await AnswerState.take_response.set()
+            await bot.send_message(message.from_id, mess, reply_markup=kb_main_admin)
+            await state.update_data(user_id=quest_text['tg_id'])
+            await state.update_data(uid=quest_text['uid'])
+            await AnswerState.take_response.set()
         else:
-            await bot.send_message(message.from_id, 'На подобранный Вам вопрос уже отвечают, вопспользуйтесь кнопкой <b>«Ответить на вопросы»</b> на клавиатуре.', parse_mode='HTML')
+            await bot.send_message(message.from_id,
+                                   'На подобранный Вам вопрос уже отвечают, вопспользуйтесь кнопкой <b>«Ответить на вопросы»</b> на клавиатуре.',
+                                   parse_mode='HTML')
 
     except:
         await bot.send_message(message.from_id, 'Актуальных вопросов нет!')
+
+
+@dp.message_handler(Text(equals='Получить выгрузку с БД'))
+async def bd_unload(message: types.Message):
+    unloading(message.from_id)
+    await message.reply_document(open(f'unload/unload_{message.from_id}.csv', 'rb'))
+    await bot.send_message(message.from_id, f'Выгрузка участников из Базы данных по состоянию на {datetime.now().strftime("%H:%M:%S %d.%m.%y")}', reply_markup=kb_main_admin)
+    os.remove(f'unload/unload_{message.from_id}.csv')
+
+
 
 
 @dp.message_handler(state=AnswerState.take_response)
@@ -391,10 +414,10 @@ async def take_resp(message: types.Message, state: FSMContext):
     await state.update_data(take_response=message.text)
     data = await state.get_data()
     uid = data.get('uid')
-    answer_collect(uid,message.text)
-    await bot.send_message(data.get('user_id'),message.text)
+    answer_collect(uid, message.text)
+    await bot.send_message(data.get('user_id'), message.text)
     await state.finish()
-    await bot.send_message(message.from_id, 'Ответ отправлен пользователю!',reply_markup=kb_main_admin)
+    await bot.send_message(message.from_id, 'Ответ отправлен пользователю!', reply_markup=kb_main_admin)
 
 
 @retry(wait=wait_random(min=1, max=2))

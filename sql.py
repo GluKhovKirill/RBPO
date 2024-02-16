@@ -1,5 +1,19 @@
 import pymysql
+from adaptix import Retort
 from config import host, user, password, d_name
+import dataclasses
+
+@dataclasses.dataclass
+class USER:
+    uid: str
+    form_id: str
+    surname: str
+    name: str
+    otchestvo: str
+    day: str
+    org: str
+    mail: str
+    tg: str
 
 
 def create_db():
@@ -110,14 +124,14 @@ def create_table_admins():
 
 
 def create_table_from_gmail():
-        con = pymysql.connect(host=host, user=user, password=password, database=d_name)
-        with con:
-            cur = con.cursor()
-            try:
-                cur.execute(
-                    f"CREATE TABLE from_gmail (`uid` INT NOT NULL AUTO_INCREMENT, `form_id` BIGINT NOT NULL, `surname` TEXT NOT NULL, `name` TEXT NOT NULL, `otchestvo` TEXT NOT NULL, `day` TEXT NOT NULL, `org` TEXT NOT NULL, `mail` TEXT NOT NULL, `tg` TEXT NOT NULL, PRIMARY KEY (`uid`))")
-            except:
-                print('Table is exist')
+    con = pymysql.connect(host=host, user=user, password=password, database=d_name)
+    with con:
+        cur = con.cursor()
+        try:
+            cur.execute(
+                f"CREATE TABLE from_gmail (`uid` INT NOT NULL AUTO_INCREMENT, `form_id` BIGINT NOT NULL, `surname` TEXT NOT NULL, `name` TEXT NOT NULL, `otchestvo` TEXT NOT NULL, `day` TEXT NOT NULL, `org` TEXT NOT NULL, `mail` TEXT NOT NULL, `tg` TEXT NOT NULL, PRIMARY KEY (`uid`))")
+        except:
+            print('Table is exist')
 
 
 def create_table_questions():
@@ -177,7 +191,8 @@ def gmail_catcher(form_id, surname, name, otchestvo, day, org, mail, tg):
     con = pymysql.connect(host=host, user=user, password=password, database=d_name)
     with con:
         cur = con.cursor()
-        cur.execute(f"INSERT INTO `from_gmail`(`form_id`, `surname`, `name`, `otchestvo`, `day`, `org`, `mail`, `tg`) VALUES ('{form_id}','{surname}','{name}','{otchestvo}','{day}','{org}','{mail}','{tg}')")
+        cur.execute(
+            f"INSERT INTO `from_gmail`(`form_id`, `surname`, `name`, `otchestvo`, `day`, `org`, `mail`, `tg`) VALUES ('{form_id}','{surname}','{name}','{otchestvo}','{day}','{org}','{mail}','{tg}')")
         con.commit()
 
 
@@ -206,4 +221,34 @@ def quest_checker():
         for i in dataframe:
             counter += 1
     return counter
+
+
+def unloading(tg_id):
+    all_data = []
+    retort = Retort()
+    con = pymysql.connect(host=host, user=user, password=password, database=d_name)
+    with con:
+        cur = con.cursor()
+        cur.execute(f"SELECT * FROM `from_gmail`")
+        data = cur.fetchall()
+    for i in data:
+        processed_persons: list[USER] = []
+        processed_persons.append(USER(
+            uid=i[0],
+            form_id=i[1],
+            surname=i[2],
+            name=i[3],
+            otchestvo=i[4],
+            day=i[5],
+            org=i[6],
+            mail=i[7],
+            tg=i[8]
+        )
+        )
+        all_data.append(dict(reversed(list(retort.dump(processed_persons[0], USER).items()))))
+
+    with open(f'unload/unload_{tg_id}.csv', 'w', encoding='utf-8') as f:
+        f.write("uid;form_id;surname;name;otchestvo;day;org;mail;tg\n")
+        for i in all_data:
+            f.write(f"{i.get('uid')};{i.get('form_id')};{i.get('surname')};{i.get('name')};{i.get('otchestvo')};{i.get('day')};{i.get('org')};{i.get('mail')};{i.get('tg')}\n")
 
