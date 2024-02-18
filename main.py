@@ -1,5 +1,5 @@
 import os
-
+from sql import users_register
 from aiogram import Bot, Dispatcher, types, executor
 from aiogram.types import InputFile, ReplyKeyboardRemove
 from config import token
@@ -17,6 +17,7 @@ from sql import take_gmail_user, create_table_main, create_table_feedback, creat
 from sql import create_table_admins, create_table_from_gmail, create_table_questions
 from tenacity import retry, wait_random
 from datetime import datetime
+from mail import send_worker
 
 bot = Bot(token=token)
 dp = Dispatcher(bot, storage=MemoryStorage())
@@ -33,6 +34,7 @@ async def error_handler(event):
 @dp.message_handler(Text(equals='Стоп'))
 @dp.message_handler(Text(equals='На главный экран'))
 async def start_comm(message: types.Message):
+    users_register(message.from_id, message.from_user.username)
     text = '''
 👋 Здравствуйте! Перед Вами информационный чат-бот <b>"Школы фундаментальных технологий РБПО"!</b> 
 
@@ -429,6 +431,7 @@ def main():
     create_table_admins()
     create_table_from_gmail()
     from_gmail_catcher()
+    send_worker()
     executor.start_polling(dp, skip_updates=True, timeout=20)
 
 

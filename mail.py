@@ -1,0 +1,90 @@
+import smtplib as smtp
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import ssl
+from sql import mail_caught, mail_flag
+from config import DAYS
+from threading import Timer
+import datetime
+
+
+def sender() -> bool:
+    data, form_id = mail_caught()
+    print('d', data, form_id)
+    if not (data and form_id):
+        return False
+    name, otchestvo, mail, tg, days = data[0], data[1], data[2], data[3], data[4]
+
+    days_substring = ""
+    for day_n in sorted(days):
+        days_substring += f' - {DAYS.get(day_n, "Не могу загрузить информацию...")}\n'
+
+    tg_substring = "Пожалуйста, убедитесь, что вы активировали бота @RBPO_bot (отправили команду /start боту) и не заблокировали его!\nБот продублирует Вам QR-код также за сутки до мероприятия/\n"
+    have_tg = bool(tg)
+
+    text = f"""
+{name} {otchestvo}!
+Мы рады приветствовать Вас в Школе фундаментальных технологий РБПО!
+Вы записались на следующие тематические дни:
+
+{days_substring}
+Соответствующие пропуска в виде QR-кодов будут отправлены вам за сутки на данную почту.
+{tg_substring if have_tg else ''}
+Ждем Вас!
+—
+С уважением, команда Школы фундаментальных технологий РБПО
+secure-software.bmstu.ru
+sdl-school@bmstu.ru
+"""
+
+    login = "appolonovnn@bmstu.ru"
+    password = "26aaiNC3"
+
+    FROM = login  # "appolonovnn@bmstu.ru"
+    context = ssl.create_default_context()
+
+    with smtp.SMTP_SSL('mail.bmstu.ru', 465, context=context) as server:
+        server.login(login, password)
+
+        msg = MIMEMultipart("alternative")
+        msg["From"] = FROM
+        # set the receiver's email
+        msg["To"] = mail
+        # set the subject
+        msg["Subject"] = "BMSTU RBPO SCHOOL"
+        # set the text
+        message = text
+        msg.attach(MIMEText(message))
+
+        server.sendmail(FROM, mail, msg.as_string())
+        print("sent")
+    mail_flag(form_id)
+    return True
+
+
+def send_worker():
+    print('send greeting mails')
+    a = sender()
+    while a:
+        a = sender()
+    delay: int = get_secs_till_six()
+    print(f'next in {delay} secs')
+    t = Timer(delay, send_worker)
+    t.start()
+
+
+# send_worker()
+
+def get_secs_till_six(target_hour=6, target_minute=0) -> int:
+    now = datetime.datetime.now()
+    if now.hour >= target_hour:  # or (target_minute<now.minute and now.hour==target_minute):
+        temp = now + datetime.timedelta(days=1)
+    else:
+        temp = now
+    target = datetime.datetime(year=temp.year, month=temp.month, day=temp.day, hour=target_hour, minute=0, second=0)
+
+    return (target - datetime.datetime.now()).seconds
+
+
+# print()
+#

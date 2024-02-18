@@ -27,12 +27,19 @@ def create_db():
             print('Database is exist')
 
 
-def users_register(tg_id, day, qr):
+def users_register(tg_id, username):
     con = pymysql.connect(host=host, user=user, password=password, database=d_name)
     with con:
         cur = con.cursor()
-        cur.execute(f'INSERT INTO `main`(`tg_id`, `day`, `qr`) VALUES ("{tg_id}", "{day}", "{qr}")')
+        cur.execute(f'SELECT  `tg_id`, `username` FROM `main`')
+        data = cur.fetchall()
+        for i in data:
+            if tg_id == i[0] and username == i[1]:
+                return
+        tg_id = tg_id.strip().lstrip('@')
+        cur.execute(f'INSERT INTO `main`(`tg_id`, `username`) VALUES ("{tg_id}", "{username}")')
         con.commit()
+
 
 
 def reg_checker(tg_id):
@@ -251,4 +258,41 @@ def unloading(tg_id):
         f.write("uid;form_id;surname;name;otchestvo;day;org;mail;tg\n")
         for i in all_data:
             f.write(f"{i.get('uid')};{i.get('form_id')};{i.get('surname')};{i.get('name')};{i.get('otchestvo')};{i.get('day')};{i.get('org')};{i.get('mail')};{i.get('tg')}\n")
+
+
+def mail_caught():
+    data = []
+    con = pymysql.connect(host=host, user=user, password=password, database=d_name)
+    with con:
+        cur = con.cursor()
+        cur.execute(f'SELECT `form_id` FROM `from_gmail` WHERE `flag` is NULL group by `form_id`')
+        id = cur.fetchone()
+        if not id:
+            return None, None
+        id = id[0]
+        cur.execute(f"SELECT `name`, `otchestvo`, `day`, `mail`, `tg` FROM `from_gmail` WHERE `form_id` = {id}")
+        datas = cur.fetchall()
+        name, otchestvo, mail, tg = None, None, None, None
+        days = set()
+        for j in datas:
+            t = [i for i in j]
+            if t[4]:
+                tg = t[4].lstrip('https://t.me/')
+            else:
+                tg = ""
+            otchestvo = t[1]
+            name = t[0]
+            mail = t[3]
+            data.append(t)
+            days.add(int(t[2].split('.')[0]))
+        folk = [name, otchestvo, mail, tg, sorted(days)]
+    return folk, id
+
+print(*mail_caught(),sep='\n')
+def mail_flag(form_id):
+    con = pymysql.connect(host=host, user=user, password=password, database=d_name)
+    with con:
+        cur = con.cursor()
+        cur.execute(f"UPDATE `from_gmail` SET `flag`= 1 WHERE `form_id` = {form_id}")
+        con.commit()
 
