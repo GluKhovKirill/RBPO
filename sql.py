@@ -114,7 +114,7 @@ def create_table_main():
         cur = con.cursor()
         try:
             cur.execute(
-                f"CREATE TABLE main (`uid` INT NOT NULL AUTO_INCREMENT, `tg_id` BIGINT NOT NULL, `day` TEXT NOT NULL, `qr` TEXT NOT NULL, PRIMARY KEY (`uid`))")
+                f"CREATE TABLE main (`uid` INT NOT NULL AUTO_INCREMENT, `tg_id` BIGINT NOT NULL,`username` TEXT NOT NULL, `qr` TEXT NOT NULL, PRIMARY KEY (`uid`))")
         except:
             print('Table is exist')
 
@@ -136,7 +136,7 @@ def create_table_from_gmail():
         cur = con.cursor()
         try:
             cur.execute(
-                f"CREATE TABLE from_gmail (`uid` INT NOT NULL AUTO_INCREMENT, `form_id` BIGINT NOT NULL, `surname` TEXT NOT NULL, `name` TEXT NOT NULL, `otchestvo` TEXT NOT NULL, `day` TEXT NOT NULL, `org` TEXT NOT NULL, `mail` TEXT NOT NULL, `tg` TEXT NOT NULL, PRIMARY KEY (`uid`))")
+                f"CREATE TABLE from_gmail (`uid` INT NOT NULL AUTO_INCREMENT, `form_id` BIGINT NOT NULL, `surname` TEXT NOT NULL, `name` TEXT NOT NULL, `otchestvo` TEXT NOT NULL, `day` TEXT NOT NULL, `org` TEXT NOT NULL, `mail` TEXT NOT NULL, `tg` TEXT NOT NULL, `flag` TINYINT NULL, PRIMARY KEY (`uid`))")
         except:
             print('Table is exist')
 
@@ -288,7 +288,7 @@ def mail_caught():
         folk = [name, otchestvo, mail, tg, sorted(days)]
     return folk, id
 
-print(*mail_caught(),sep='\n')
+
 def mail_flag(form_id):
     con = pymysql.connect(host=host, user=user, password=password, database=d_name)
     with con:
