@@ -3,7 +3,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import ssl
 from sql import mail_caught, mail_flag
-from config import DAYS
+from config import DAYS, password_mail, login
 from threading import Timer
 import datetime
 
@@ -19,7 +19,7 @@ def sender() -> bool:
     for day_n in sorted(days):
         days_substring += f' - {DAYS.get(day_n, "Не могу загрузить информацию...")}\n'
 
-    tg_substring = "Пожалуйста, убедитесь, что вы активировали бота @RBPO_bot (отправили команду /start боту) и не заблокировали его!\nБот продублирует Вам QR-код также за сутки до мероприятия/\n"
+    tg_substring = "Пожалуйста, убедитесь, что вы активировали бота @RBPO_bot (отправили команду /start боту) и не заблокировали его!\nПропуска в виде QR-кодов будут отправлены через телеграм-бота и на почту."
     have_tg = bool(tg)
 
     text = f"""
@@ -28,8 +28,13 @@ def sender() -> bool:
 Вы записались на следующие тематические дни:
 
 {days_substring}
-Соответствующие пропуска в виде QR-кодов будут отправлены вам за сутки на данную почту.
-{tg_substring if have_tg else ''}
+
+{tg_substring if have_tg else 'Пропуска в виде QR-кодов будут отправлены вам за сутки на данную почту.'}
+
+Адрес: Малый Зал Дворца культуры МГТУ им. Н.Э. Баумана (Главный учебный корпус, над Домом Физики), 2-я Бауманская улица, 5с2 (схема прохода будет предоставлена позже)
+
+Не забудьте взять с собой паспорт, если у вас нет пропуска на территорию МГТУ им. Н. Э. Баумана!
+
 Ждем Вас!
 —
 С уважением, команда Школы фундаментальных технологий РБПО
@@ -37,17 +42,16 @@ secure-software.bmstu.ru
 sdl-school@bmstu.ru
 """
 
-    login = "appolonovnn@bmstu.ru"
-    password = "26aaiNC3"
 
-    FROM = login  # "appolonovnn@bmstu.ru"
+
+    FROM = login
     context = ssl.create_default_context()
 
     with smtp.SMTP_SSL('mail.bmstu.ru', 465, context=context) as server:
-        server.login(login, password)
+        server.login(login, password_mail)
 
         msg = MIMEMultipart("alternative")
-        msg["From"] = FROM
+        msg["From"] = "sdl-school@bmstu.ru" # FROM
         # set the receiver's email
         msg["To"] = mail
         # set the subject
