@@ -17,7 +17,7 @@ from sql import take_gmail_user, create_table_main, create_table_feedback, creat
 from sql import create_table_admins, create_table_from_gmail, create_table_questions
 from tenacity import retry, wait_random
 from datetime import datetime
-from mail import send_worker
+from mail import start_sender
 from config import DAYS
 
 bot = Bot(token=token)
@@ -406,6 +406,8 @@ async def answering(message: types.Message, state: FSMContext):
 
 @dp.message_handler(Text(equals='Получить выгрузку с БД'))
 async def bd_unload(message: types.Message):
+    if not os.path.exists("unload"):
+        os.mkdir("unload")
     unloading(message.from_id)
     await message.reply_document(open(f'unload/unload_{message.from_id}.csv', 'rb'))
     await bot.send_message(message.from_id, f'Выгрузка участников из Базы данных по состоянию на {datetime.now().strftime("%H:%M:%S %d.%m.%y")}', reply_markup=kb_main_admin)
@@ -434,7 +436,7 @@ def main():
     create_table_admins()
     create_table_from_gmail()
     from_gmail_catcher()
-    send_worker()
+    start_sender()
     executor.start_polling(dp, skip_updates=True, timeout=20)
 
 

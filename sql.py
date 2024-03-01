@@ -36,7 +36,7 @@ def users_register(tg_id, username):
         for i in data:
             if tg_id == i[0] and username == i[1]:
                 return
-        tg_id = tg_id.strip().lstrip('@')
+        username = username.strip().lstrip('@')
         cur.execute(f'INSERT INTO `main`(`tg_id`, `username`) VALUES ("{tg_id}", "{username}")')
         con.commit()
 

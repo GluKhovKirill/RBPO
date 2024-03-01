@@ -1,3 +1,4 @@
+import smtplib
 import smtplib as smtp
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -42,38 +43,54 @@ secure-software.bmstu.ru
 sdl-school@bmstu.ru
 """
 
-
-
     FROM = login
     context = ssl.create_default_context()
+    try:
+        with smtp.SMTP_SSL('mail.bmstu.ru', 465, context=context) as server:
+            server.login(login, password_mail)
 
-    with smtp.SMTP_SSL('mail.bmstu.ru', 465, context=context) as server:
-        server.login(login, password_mail)
+            msg = MIMEMultipart("alternative")
+            msg["From"] = "sdl-school@bmstu.ru"  # FROM
+            # set the receiver's email
+            msg["To"] = mail
+            # set the subject
+            msg["Subject"] = "BMSTU RBPO SCHOOL"
+            # set the text
+            message = text
+            msg.attach(MIMEText(message))
 
-        msg = MIMEMultipart("alternative")
-        msg["From"] = "sdl-school@bmstu.ru" # FROM
-        # set the receiver's email
-        msg["To"] = mail
-        # set the subject
-        msg["Subject"] = "BMSTU RBPO SCHOOL"
-        # set the text
-        message = text
-        msg.attach(MIMEText(message))
-
-        server.sendmail(FROM, mail, msg.as_string())
-        print("sent")
+            server.sendmail(FROM, mail, msg.as_string())
+            print("sent")
+    except smtplib.SMTPDataError as err:
+        print("mail sending error:", err)
+        return False
     mail_flag(form_id)
     return True
 
 
 def send_worker():
     print('send greeting mails')
-    a = sender()
-    while a:
+    a = None
+    try:
         a = sender()
-    delay: int = get_secs_till_six()
+        while a:
+            a = sender()
+    except Exception as err:
+        a = None
+        print("mailing critical", err)
+
+    if a == None:
+        print("set delay 15 min")
+        delay: int = 15 * 60
+    else:
+        delay: int = get_secs_till_six()
     print(f'next in {delay} secs')
     t = Timer(delay, send_worker)
+    t.start()
+
+
+def start_sender() -> None:
+    t = Timer(5, send_worker)
     t.start()
 
 
@@ -88,7 +105,6 @@ def get_secs_till_six(target_hour=6, target_minute=0) -> int:
     target = datetime.datetime(year=temp.year, month=temp.month, day=temp.day, hour=target_hour, minute=0, second=0)
 
     return (target - datetime.datetime.now()).seconds
-
 
 # print()
 #
