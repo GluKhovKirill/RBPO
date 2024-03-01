@@ -63,7 +63,7 @@ sdl-school@bmstu.ru
             print("sent")
     except smtplib.SMTPDataError as err:
         print("mail sending error:", err)
-        return False
+        return None
     mail_flag(form_id)
     return True
 
