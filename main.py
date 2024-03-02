@@ -19,6 +19,7 @@ from tenacity import retry, wait_random
 from datetime import datetime
 from mail import start_sender
 from config import DAYS
+from tg_notifier import start_notifier
 
 bot = Bot(token=token)
 dp = Dispatcher(bot, storage=MemoryStorage())
@@ -335,7 +336,8 @@ async def register(message: types.Message):
     data = take_gmail_user(user)
     if data:
         await bot.send_message(message.from_id, 'Вы зарегистрированы на следующие события:')
-        data = [DAYS[i] for i in sorted([int(i.split('.')[0].strip().strip("День")) for i in data])]#[f'День {i}\n' for i in sorted(data, key=lambda x: x.split('. ')[0])]
+        data = [DAYS[i] for i in sorted([int(i.split('.')[0].strip().strip("День")) for i in
+                                         data])]  # [f'День {i}\n' for i in sorted(data, key=lambda x: x.split('. ')[0])]
         print(data)
         for i in data:
             mess += f'{i}\n\n'
@@ -410,10 +412,10 @@ async def bd_unload(message: types.Message):
         os.mkdir("unload")
     unloading(message.from_id)
     await message.reply_document(open(f'unload/unload_{message.from_id}.csv', 'rb'))
-    await bot.send_message(message.from_id, f'Выгрузка участников из Базы данных по состоянию на {datetime.now().strftime("%H:%M:%S %d.%m.%y")}', reply_markup=kb_main_admin)
+    await bot.send_message(message.from_id,
+                           f'Выгрузка участников из Базы данных по состоянию на {datetime.now().strftime("%H:%M:%S %d.%m.%y")}',
+                           reply_markup=kb_main_admin)
     os.remove(f'unload/unload_{message.from_id}.csv')
-
-
 
 
 @dp.message_handler(state=AnswerState.take_response)
@@ -427,7 +429,8 @@ async def take_resp(message: types.Message, state: FSMContext):
     await bot.send_message(message.from_id, 'Ответ отправлен пользователю!', reply_markup=kb_main_admin)
 
 
-#@retry(wait=wait_random(min=1, max=2))
+
+# @retry(wait=wait_random(min=1, max=2))
 def main():
     create_db()
     create_table_main()
@@ -435,8 +438,9 @@ def main():
     create_table_questions()
     create_table_admins()
     create_table_from_gmail()
-    from_gmail_catcher()
-    start_sender()
+    # from_gmail_catcher()
+    # start_sender()
+    start_notifier(bot)
     executor.start_polling(dp, skip_updates=True, timeout=20)
 
 

@@ -3,6 +3,7 @@ from adaptix import Retort
 from config import host, user, password, d_name
 import dataclasses
 
+
 @dataclasses.dataclass
 class USER:
     uid: str
@@ -39,7 +40,6 @@ def users_register(tg_id, username):
         username = username.strip().lstrip('@')
         cur.execute(f'INSERT INTO `main`(`tg_id`, `username`) VALUES ("{tg_id}", "{username}")')
         con.commit()
-
 
 
 def reg_checker(tg_id):
@@ -257,7 +257,8 @@ def unloading(tg_id):
     with open(f'unload/unload_{tg_id}.csv', 'w', encoding='utf-8') as f:
         f.write("uid;form_id;surname;name;otchestvo;day;org;mail;tg\n")
         for i in all_data:
-            f.write(f"{i.get('uid')};{i.get('form_id')};{i.get('surname')};{i.get('name')};{i.get('otchestvo')};{i.get('day')};{i.get('org')};{i.get('mail')};{i.get('tg')}\n")
+            f.write(
+                f"{i.get('uid')};{i.get('form_id')};{i.get('surname')};{i.get('name')};{i.get('otchestvo')};{i.get('day')};{i.get('org')};{i.get('mail')};{i.get('tg')}\n")
 
 
 def mail_caught():
@@ -294,5 +295,31 @@ def mail_flag(form_id):
     with con:
         cur = con.cursor()
         cur.execute(f"UPDATE `from_gmail` SET `flag`= 1 WHERE `form_id` = {form_id}")
+        con.commit()
+
+
+def get_tg_valid_users():
+    con = pymysql.connect(host=host, user=user, password=password, database=d_name)
+    with con:
+        cur = con.cursor()
+        cur.execute(f"SELECT `tg_id`,`username` FROM `main` WHERE `username` is NOT NULL;")
+        data = cur.fetchall()
+    return data
+
+
+def get_data_by_alias(tg_alias: str):
+    #
+    con = pymysql.connect(host=host, user=user, password=password, database=d_name)
+    with con:
+        cur = con.cursor()
+        cur.execute(f"""SELECT name,otchestvo,day FROM `from_gmail` WHERE (tg = "{tg_alias}" or tg = "@{tg_alias}") AND (`flag_tg` IS NULL);""")
+        data = cur.fetchall()
+    return data
+
+def db_update(username):
+    con = pymysql.connect(host=host, user=user, password=password, database=d_name)
+    with con:
+        cur = con.cursor()
+        cur.execute(f"UPDATE `from_gmail` SET `flag_tg`= 1 WHERE `tg` = '{username}'")
         con.commit()
 
