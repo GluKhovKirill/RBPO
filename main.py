@@ -1,3 +1,4 @@
+import asyncio
 import os
 from sql import users_register
 from aiogram import Bot, Dispatcher, types, executor
@@ -20,9 +21,14 @@ from datetime import datetime
 from mail import start_sender
 from config import DAYS
 from tg_notifier import start_notifier
+import logging
+
+logging.basicConfig(level=logging.INFO, filename="/logs/Bot.log",
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 bot = Bot(token=token)
-dp = Dispatcher(bot, storage=MemoryStorage())
+loop = asyncio.get_event_loop()
+dp = Dispatcher(bot, storage=MemoryStorage(), loop=loop)
 
 '''
 @dp.errors_handler(exception=exceptions.NetworkError)
@@ -440,7 +446,8 @@ def main():
     create_table_from_gmail()
     # from_gmail_catcher()
     # start_sender()
-    start_notifier(bot)
+
+    dp.loop.create_task(start_notifier(bot))
     executor.start_polling(dp, skip_updates=True, timeout=20)
 
 

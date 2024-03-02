@@ -1,10 +1,15 @@
+import asyncio
+
+import aiogram.utils.exceptions
+import logging
 from sql import get_tg_valid_users, get_data_by_alias, db_update
 from config import DAYS
-import asgiref.sync
-from threading import Timer
+# import asgiref.sync
+# from threading import Timer
 
 
-@asgiref.sync.async_to_sync
+
+# @asgiref.sync.async_to_sync
 async def notify(bot):
     for uid, tg_alias in get_tg_valid_users():
         # tg_alias from from_gmail
@@ -36,17 +41,26 @@ async def notify(bot):
 Ждем Вас!
 """.strip()
         # print(uid, text,sep='\n')
-
-        await bot.send_message(uid, text, parse_mode="HTML")
-        print(f"Sent to {uid} ({tg_alias})", flush=True)
-        db_update(tg_alias)
+        logging.info(f"Sending to {uid} ({tg_alias})")
+        try:
+            await bot.send_message(uid, text, parse_mode="HTML")
+            db_update(tg_alias)
+        except aiogram.utils.exceptions.ChatNotFound:
+            logging.warning(f"Чат не найден:  {uid} ({tg_alias})")
+        except aiogram.utils.exceptions.BotBlocked:
+            logging.error(f"Чел заблочил бота:  {uid} ({tg_alias})")
+        except Exception as err:
+            logging.critical("Дичь при отправке", err)
         # await bot.send_location(uid, 55.767017, 37.684634)
 
 
-def start_notifier(bot):
-    try:
-        notify(bot)
-    except Exception as err:
-        print("Нотифаер тг ругается:",err)
+async def start_notifier(bot):
+    while True:
+        try:
+            await notify(bot)
+        except Exception as err:
+            logging.critical("Нотифаер тг ругается:",err)
+        finally:
+            await asyncio.sleep(20)
     #t = Timer(20, start_notifier, [bot])
     #t.start()

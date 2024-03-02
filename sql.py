@@ -136,7 +136,7 @@ def create_table_from_gmail():
         cur = con.cursor()
         try:
             cur.execute(
-                f"CREATE TABLE from_gmail (`uid` INT NOT NULL AUTO_INCREMENT, `form_id` BIGINT NOT NULL, `surname` TEXT NOT NULL, `name` TEXT NOT NULL, `otchestvo` TEXT NOT NULL, `day` TEXT NOT NULL, `org` TEXT NOT NULL, `mail` TEXT NOT NULL, `tg` TEXT NOT NULL, `flag` TINYINT NULL, PRIMARY KEY (`uid`))")
+                f"CREATE TABLE from_gmail (`uid` INT NOT NULL AUTO_INCREMENT, `form_id` BIGINT NOT NULL, `surname` TEXT NOT NULL, `name` TEXT NOT NULL, `otchestvo` TEXT NOT NULL, `day` TEXT NOT NULL, `org` TEXT NOT NULL, `mail` TEXT NOT NULL, `tg` TEXT NOT NULL, `flag` , `flag_tg` TINYINT NULL, PRIMARY KEY (`uid`))")
         except:
             print('Table is exist')
 
