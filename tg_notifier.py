@@ -19,7 +19,7 @@ async def notify(bot):
             continue
         name = user_data[0][0]
         otchestvo = user_data[0][1]
-        days = [int(i[2].lower().strip().strip("день").split(".")[0]) for i in user_data]
+        days = set([int(i[2].lower().strip().strip("день").split(".")[0]) for i in user_data])
 
         days_substring = ""
         for day_n in sorted(days):
