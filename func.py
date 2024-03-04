@@ -76,7 +76,7 @@ def quest_frame_checker():
 def uid_generator():
     ans=[]
     all_data = sql_uid_cather()
-    for data in all_data[:5]: # todo remove
+    for data in all_data:
         url_code = base64.b64encode((f"{data[0]}_1").encode("UTF-8"))
         final_code = str(url_code).split("'")[1].strip("==")
         username = data[4]
