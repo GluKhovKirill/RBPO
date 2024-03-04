@@ -17,8 +17,6 @@ async def send_tg(message):
         tg_id = i["tg_id"]
         msg = i["mess"]
         qr_path = i["qr"]
-        if tg_id != 403054226:
-            continue
         print("sent 2", tg_id)
 
         print(qr_path,flush=True)
