@@ -5,7 +5,7 @@ __pycache__/
 
 # C extensions
 *.so
-
+qr_codes/*
 # Distribution / packaging
 .Python
 build/
