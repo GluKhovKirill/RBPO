@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 import json
 from sql import gmail_catcher
 from threading import Timer
-from sql import quest_checker
+from sql import quest_checker, sql_tg_id_catcher, sql_uid_cather
 
 
 MAIL_CHECK_TIMER = None
@@ -17,7 +17,7 @@ DB_CHECK_DELAY = 5
 def qr_maker(tg_id, day):
     name = f'qr_{tg_id}.png'
     version, level, qr_name = amzqr.run(
-        words=f'{day}/{tg_id}',
+        words=f'',
         version=1,
         level='H',
         picture='qr_codes/bg.jpg',
@@ -71,5 +71,51 @@ def quest_frame_checker():
 
     DB_CHECK_TIMER = Timer(DB_CHECK_DELAY, quest_frame_checker)
     DB_CHECK_TIMER.start()
+
+
+def uid_generator():
+    ans=[]
+    all_data = sql_uid_cather()
+    for data in all_data:
+        url_code = base64.b64encode((f"{data[0]}_1").encode("UTF-8"))
+        final_code = str(url_code).split("'")[1].strip("==")
+        username = data[4]
+        mess = f"""
+{data[2]} {data[3]}, напоминаем Вам, что завтра пройдут первые лекции по фундаментальным информационным технологиям, их развитию в России и в мире « (https://secure-software.bmstu.ru/)Школа фундаментальных технологий РБПО (https://secure-software.bmstu.ru/)» (https://secure-software.bmstu.ru/)💛
+
+https://secure-software.bmstu.ru/confirm.html?register=remote&uid={final_code}
+https://rbpo-school-validation.tw1.ru:1830/visited?uid={final_code}
+
+📍 Где? 
+Малый Зал ЦКИ (ГУК, над Домом Физики)
+
+📍 Программа дня:
+
+«Операционные системы на основе ядра Linux: сообщество, дистрибутив, жизненный цикл». 
+⏲11:00 - 13:00
+👥Спикер: Георгий Курячий, ведущий разработчик ОС «Альт» (https://www.basealt.ru/) и преподаватель факультета вычислительной математики и кибернетики (ВМК) МГУ.😀
+🔔 Анонс
+
+❗️Кофе-брейк: 13:00-13:30
+
+«Микроядерные операционные системы. Summa technologiae». 
+⏲13:30 - 15:30
+👥Спикеры: Сергей Рогачев,
+руководитель отдела разработки безопасной платформы, и широко известный в сообществе Дмитрий Шмойлов, руководитель отдела безопасности программных продуктов «Лаборатории Касперского» (https://os.kaspersky.ru/development/)        
+        
+"""
+        tg_id = sql_tg_id_catcher(username)
+        if tg_id == None:
+            continue
+        else:
+            tg_id = tg_id[0]
+
+        user = {"tg_id": tg_id, "mess": mess,
+                "mail": "kirill.gluhov2003@yandex.ru"}
+        ans.append(user)
+
+    return ans
+
+# print(uid_generator())
 
 

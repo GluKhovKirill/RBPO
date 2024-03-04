@@ -316,6 +316,7 @@ def get_data_by_alias(tg_alias: str):
         data = cur.fetchall()
     return data
 
+
 def db_update(username):
     con = pymysql.connect(host=host, user=user, password=password, database=d_name)
     with con:
@@ -323,3 +324,20 @@ def db_update(username):
         cur.execute(f"UPDATE `from_gmail` SET `flag_tg`= 1 WHERE `tg` = '{username}'")
         con.commit()
 
+
+def sql_uid_cather():
+    con = pymysql.connect(host=host, user=user, password=password, database=d_name)
+    with con:
+        cur = con.cursor()
+        cur.execute(f"SELECT `uid`, `surname`, `name`, `otchestvo`, `tg` FROM from_gmail WHERE day LIKE '1.%'")
+        data = cur.fetchall()
+    return data
+
+
+def sql_tg_id_catcher(username):
+    con = pymysql.connect(host=host, user=user, password=password, database=d_name)
+    with con:
+        cur = con.cursor()
+        cur.execute(f"SELECT `tg_id` FROM `main` WHERE username = '{username}'")
+        data = cur.fetchone()
+    return data
