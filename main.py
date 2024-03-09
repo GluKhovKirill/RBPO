@@ -445,9 +445,12 @@ def main():
     create_table_admins()
     create_table_from_gmail()
     from_gmail_catcher()
-    start_sender()
 
-    dp.loop.create_task(start_notifier(bot))
+    # TODO: Раскоменти перед рассылкой
+    # start_sender()
+    # dp.loop.create_task(start_notifier(bot))
+    # TODO -----------------------------
+
     executor.start_polling(dp, skip_updates=True, timeout=20)
 
 
