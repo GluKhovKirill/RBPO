@@ -329,10 +329,9 @@ def sql_uid_cather():
     con = pymysql.connect(host=host, user=user, password=password, database=d_name)
     with con:
         cur = con.cursor()
-        cur.execute(f"SELECT `uid`, `surname`, `name`, `otchestvo`, `tg`, `mail` FROM from_gmail WHERE day LIKE '1.%'")
+        cur.execute(f"SELECT `uid`, `surname`, `name`, `otchestvo`, `tg`, `mail` FROM from_gmail WHERE day LIKE '2.%' AND `qr_flag` is NULL")
         data = cur.fetchall()
     return data
-
 
 
 def sql_tg_id_catcher(username):
@@ -342,4 +341,13 @@ def sql_tg_id_catcher(username):
         cur.execute(f"SELECT `tg_id` FROM `main` WHERE username = '{username}'")
         data = cur.fetchone()
     return data
-# >>>>>>> Stashed changes
+
+
+
+def qr_flag_changer(username):
+    con = pymysql.connect(host=host, user=user, password=password, database=d_name)
+    with con:
+        cur = con.cursor()
+        cur.execute(f"UPDATE `from_gmail` SET `qr_flag`= 1 WHERE `tg` = '{username}'")
+        con.commit()
+

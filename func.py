@@ -8,7 +8,7 @@ import email
 import base64
 from bs4 import BeautifulSoup
 import json
-from sql import gmail_catcher
+from sql import gmail_catcher, qr_flag_changer
 from threading import Timer
 from sql import quest_checker, sql_tg_id_catcher, sql_uid_cather
 from config import DAYS, password_mail, login
@@ -26,7 +26,7 @@ DB_CHECK_DELAY = 5
 def qr_maker(tg_id):
     name = f'qr_{tg_id}.png'
     version, level, qr_name = amzqr.run(
-        words=f'{tg_id}',
+        words=f'https://rbpo-school-validation.tw1.ru:1830/visited?uid={tg_id}',
         version=1,
         level='H',
         picture='qr_codes/bg.jpg',
@@ -87,7 +87,7 @@ def uid_generator():
     ans=[]
     all_data = sql_uid_cather()
     for data in all_data:
-        url_code = base64.b64encode((f"{data[0]}_1").encode("UTF-8"))
+        url_code = base64.b64encode((f"{data[0]}_2").encode("UTF-8"))
         final_code = str(url_code).split("'")[1].strip("==")
         username = data[4]
         mail = data[5]
@@ -140,6 +140,7 @@ https://secure-software.bmstu.ru/confirm.html?register=remote&uid={final_code}
             try:
                 sender(mess, mail, qr_fname)
                 print("sent 2",mail)
+                qr_flag_changer(username)
                 break
             except Exception as err:
                 print("ERR", err)
