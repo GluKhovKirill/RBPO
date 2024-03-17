@@ -329,7 +329,7 @@ def sql_uid_cather():
     con = pymysql.connect(host=host, user=user, password=password, database=d_name)
     with con:
         cur = con.cursor()
-        cur.execute(f"SELECT `uid`, `surname`, `name`, `otchestvo`, `tg` FROM from_gmail WHERE day LIKE '1.%'")
+        cur.execute(f"SELECT `uid`, `surname`, `name`, `otchestvo`, `tg` FROM from_gmail WHERE day LIKE '2.%' and `qr_flag_tg` is NULL")
         data = cur.fetchall()
     return data
 
@@ -341,3 +341,13 @@ def sql_tg_id_catcher(username):
         cur.execute(f"SELECT `tg_id` FROM `main` WHERE username = '{username}'")
         data = cur.fetchone()
     return data
+
+
+def qr_flag_tg_checker(username):
+    con = pymysql.connect(host=host, user=user, password=password, database=d_name)
+    with con:
+        cur = con.cursor()
+        cur.execute(f"UPDATE `from_gmail` SET `qr_flag_tg`= 1 WHERE tg = '{username}'")
+        con.commit()
+
+# qr_flag_tg_checker('KGLukhov')

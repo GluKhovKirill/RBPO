@@ -5,7 +5,7 @@ import email
 import base64
 from bs4 import BeautifulSoup
 import json
-from sql import gmail_catcher
+from sql import gmail_catcher, qr_flag_tg_checker
 from threading import Timer
 from sql import quest_checker, sql_tg_id_catcher, sql_uid_cather
 
@@ -76,8 +76,9 @@ def quest_frame_checker():
 def uid_generator():
     ans=[]
     all_data = sql_uid_cather()
+    print("ALL",all_data)
     for data in all_data:
-        url_code = base64.b64encode((f"{data[0]}_1").encode("UTF-8"))
+        url_code = base64.b64encode((f"{data[0]}_2").encode("UTF-8"))
         final_code = str(url_code).split("'")[1].strip("==")
         username = data[4]
         qr_fname = qr_maker(final_code)
@@ -123,9 +124,10 @@ https://secure-software.bmstu.ru/confirm.html?register=remote&uid={final_code}
             tg_id = tg_id[0]
 
         user = {"tg_id": tg_id, "mess": mess,
-                "mail": "kirill.gluhov2003@yandex.ru",
+                # "mail": "kirill.gluhov2003@yandex.ru",
                 "qr": qr_fname}
         ans.append(user)
+        qr_flag_tg_checker(username)
 
     return ans
 
