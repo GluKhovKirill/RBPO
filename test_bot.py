@@ -20,7 +20,7 @@ async def send_tg(message):
         print("sent 2", tg_id)
 
         print(qr_path,flush=True)
-        with open("qr_codes\\"+qr_path, 'rb')as f:
+        with open("qr_codes\\"+qr_path, 'rb')as f: # TODO: починить относительные пути - Docker не видит QR'ы
             await bot.send_message(tg_id, msg)
             await bot.send_photo(tg_id, f)
         os.remove("qr_codes\\"+qr_path)
