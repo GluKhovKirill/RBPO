@@ -3,8 +3,9 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 kb_main = ReplyKeyboardMarkup(resize_keyboard=True)
 kb_main_1 = KeyboardButton('Регистрация')
 kb_main_2 = KeyboardButton('Подробнее о цикле лекций')
-kb_main_3 = KeyboardButton('Обратная связь')
-kb_main.add(kb_main_2, kb_main_3).add(kb_main_1)
+kb_main_3 = KeyboardButton('Показать QR')
+kb_main_4 = KeyboardButton('Обратная связь')
+kb_main.add(kb_main_2, kb_main_3).add(kb_main_1, kb_main_4)
 
 kb_main_admin = ReplyKeyboardMarkup(resize_keyboard=True)
 kb_main_admin.add(KeyboardButton('Ответить на вопросы')).add(KeyboardButton('Получить выгрузку с БД'))

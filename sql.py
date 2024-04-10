@@ -312,9 +312,11 @@ def get_data_by_alias(tg_alias: str):
     con = pymysql.connect(host=host, user=user, password=password, database=d_name)
     with con:
         cur = con.cursor()
-        cur.execute(f"""SELECT name,otchestvo,day FROM `from_gmail` WHERE (tg = "{tg_alias}" or tg = "@{tg_alias}") AND (`flag_tg` IS NULL);""")
+        cur.execute(
+            f"""SELECT name,otchestvo,day FROM `from_gmail` WHERE (tg = "{tg_alias}" or tg = "@{tg_alias}") AND (`flag_tg` IS NULL);""")
         data = cur.fetchall()
     return data
+
 
 def db_update(username):
     con = pymysql.connect(host=host, user=user, password=password, database=d_name)
@@ -323,3 +325,13 @@ def db_update(username):
         cur.execute(f"UPDATE `from_gmail` SET `flag_tg`= 1 WHERE `tg` = '{username}'")
         con.commit()
 
+
+
+def qr_uid_finder(username):
+    con = pymysql.connect(host=host, user=user, password=password, database=d_name)
+    with con:
+        cur = con.cursor()
+        cur.execute(f"SELECT `uid` FROM `from_gmail` WHERE day like '3.%' and `tg` = '{username}'")
+        data = cur.fetchone()
+        if data: data = data[0]
+    return data

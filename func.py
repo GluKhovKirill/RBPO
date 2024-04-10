@@ -14,10 +14,10 @@ MAIL_CHECK_TIMER = None
 MAIL_CHECK_DELAY = 30
 DB_CHECK_TIMER = None
 DB_CHECK_DELAY = 5
-def qr_maker(tg_id, day):
+def qr_maker(tg_id):
     name = f'qr_{tg_id}.png'
     version, level, qr_name = amzqr.run(
-        words=f'{day}/{tg_id}',
+        words=f'https://rbpo-school-validation.tw1.ru:1830/visited?uid={tg_id}',
         version=1,
         level='H',
         picture='qr_codes/bg.jpg',

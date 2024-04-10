@@ -1,10 +1,11 @@
 import asyncio
+import base64
 import os
 from sql import users_register
 from aiogram import Bot, Dispatcher, types, executor
 from aiogram.types import InputFile, ReplyKeyboardRemove
 from config import token
-from func import from_gmail_catcher
+from func import from_gmail_catcher, qr_maker
 from keyboards import kb_main, kb_info
 from keyboards import kb_day1, kb_day2, kb_day3, kb_day4, kb_day5, kb_day6
 from keyboards import kb_main_admin
@@ -16,18 +17,21 @@ from aiogram.dispatcher import FSMContext
 from sql import admin_catcher, quest_insert, answer_caughter, answer_collect, unloading
 from sql import take_gmail_user, create_table_main, create_table_feedback, create_db
 from sql import create_table_admins, create_table_from_gmail, create_table_questions
+from sql import qr_uid_finder
 from tenacity import retry, wait_random
 from datetime import datetime
 from mail import start_sender
 from config import DAYS
 from tg_notifier import start_notifier
 import logging
+import asyncio
 
 logging.basicConfig(level=logging.INFO, filename="/logs/Bot.log",
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 bot = Bot(token=token)
 loop = asyncio.get_event_loop()
+qr_lock = asyncio.Lock()
 dp = Dispatcher(bot, storage=MemoryStorage(), loop=loop)
 
 '''
@@ -52,6 +56,36 @@ async def start_comm(message: types.Message):
         await bot.send_message(message.from_id, 'Приветствую, тебя админ!', reply_markup=kb_main_admin)
     else:
         await bot.send_message(message.from_id, text, reply_markup=kb_main, parse_mode="HTML")
+
+
+@dp.message_handler(Text(equals='Показать QR'))
+async def qr_show(message: types.Message):
+    await qr_lock.acquire()
+    try:
+        username = message.from_user.username
+
+        uid = qr_uid_finder(username)
+        if uid:
+            url_code = base64.b64encode((f"{uid}_3").encode("UTF-8"))
+            final_code = str(url_code).split("'")[1].strip("==")
+            # print("U",uid)
+            if not os.path.exists(f'qr_codes/qr_{final_code}.png'):
+                qr_maker(final_code)
+                logging.info(f'qr is created for {username}')
+            qr = InputFile(f'qr_codes/qr_{final_code}.png')
+            await bot.send_photo(message.from_id, photo=qr)
+            await bot.send_message(message.from_id, 'Ваш QR-код на мероприятие!', reply_markup=kb_main)
+            os.remove(f'qr_codes/qr_{final_code}.png')
+            logging.info(f'qr is sent for {username}')
+        else:
+            await bot.send_message(message.from_id,
+                                   'К сожалению, данный аккаунт не найден в базе. Проверьте наличие QR-кода на почте!',
+                                   reply_markup=kb_main)
+    except BaseException as err:
+        # print("Err",err)
+        logging.warning(f"QR ERR: {err}")
+    finally:
+        qr_lock.release()
 
 
 @dp.message_handler(Text(equals='Подробнее о цикле лекций'))
@@ -433,7 +467,6 @@ async def take_resp(message: types.Message, state: FSMContext):
     await bot.send_message(data.get('user_id'), message.text)
     await state.finish()
     await bot.send_message(message.from_id, 'Ответ отправлен пользователю!', reply_markup=kb_main_admin)
-
 
 
 # @retry(wait=wait_random(min=1, max=2))
