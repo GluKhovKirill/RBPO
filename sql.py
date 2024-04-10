@@ -350,10 +350,11 @@ def qr_flag_changer(username):
         cur = con.cursor()
         cur.execute(f"UPDATE `from_gmail` SET `qr_flag`= 1 WHERE `tg` = '{username}'")
         con.commit()
-
-def qr_flag_roll(username):^M
-    con = pymysql.connect(host=host, user=user, password=password, database=d_name)^M
-    with con:^M
-        cur = con.cursor()^M
-        cur.execute(f"UPDATE `from_gmail` SET `qr_flag`= 0 WHERE `tg` = '{username}'")^M
-        con.commit()^M
+'''
+def qr_flag_roll(username):
+    con = pymysql.connect(host=host, user=user, password=password, database=d_name)
+    with con:
+        cur = con.cursor()
+        cur.execute(f"UPDATE `from_gmail` SET `qr_flag`= 0 WHERE `tg` = '{username}'")
+        con.commit()
+'''
