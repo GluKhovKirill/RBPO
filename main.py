@@ -66,7 +66,7 @@ async def qr_show(message: types.Message):
 
         uid = qr_uid_finder(username)
         if uid:
-            url_code = base64.b64encode((f"{uid}_3").encode("UTF-8"))
+            url_code = base64.b64encode((f"{uid}_4").encode("UTF-8"))
             final_code = str(url_code).split("'")[1].strip("==")
             # print("U",uid)
             if not os.path.exists(f'qr_codes/qr_{final_code}.png'):
