@@ -329,7 +329,7 @@ def sql_uid_cather():
     con = pymysql.connect(host=host, user=user, password=password, database=d_name)
     with con:
         cur = con.cursor()
-        cur.execute(f"SELECT `uid`, `surname`, `name`, `otchestvo`, `tg`, `mail` FROM from_gmail WHERE day LIKE '3.%' AND `qr_flag` is NULL")
+        cur.execute(f"SELECT `uid`, `surname`, `name`, `otchestvo`, `tg`, `mail` FROM from_gmail WHERE day LIKE '4.%' AND `qr_flag` is NULL")
         data = cur.fetchall()
     return data
 
