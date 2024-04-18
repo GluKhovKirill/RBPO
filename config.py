@@ -18,3 +18,4 @@ DAYS = {
 
 login = os.getenv("mail_login","")
 password_mail = os.getenv("mail_pass","")
+DAY_N = 4

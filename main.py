@@ -4,7 +4,7 @@ import os
 from sql import users_register
 from aiogram import Bot, Dispatcher, types, executor
 from aiogram.types import InputFile, ReplyKeyboardRemove
-from config import token
+from config import token, DAY_N
 from func import from_gmail_catcher, qr_maker
 from keyboards import kb_main, kb_info
 from keyboards import kb_day1, kb_day2, kb_day3, kb_day4, kb_day5, kb_day6
@@ -66,7 +66,7 @@ async def qr_show(message: types.Message):
 
         uid = qr_uid_finder(username)
         if uid:
-            url_code = base64.b64encode((f"{uid}_4").encode("UTF-8"))
+            url_code = base64.b64encode((f"{uid}_{DAY_N}").encode("UTF-8"))
             final_code = str(url_code).split("'")[1].strip("==")
             # print("U",uid)
             if not os.path.exists(f'qr_codes/qr_{final_code}.png'):
