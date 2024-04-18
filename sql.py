@@ -326,12 +326,12 @@ def db_update(username):
         con.commit()
 
 
-
-def qr_uid_finder(username):
+def qr_uid_finder(username: str):
+    uname_lower = username.strip().lower()
     con = pymysql.connect(host=host, user=user, password=password, database=d_name)
     with con:
         cur = con.cursor()
-        cur.execute(f"SELECT `uid` FROM `from_gmail` WHERE day like '{DAY_N}.%' and `tg` = '{username}'")
+        cur.execute(f"SELECT `uid` FROM `from_gmail` WHERE day like '{DAY_N}.%' and LOWER(`tg`) = '{uname_lower}'")
         data = cur.fetchone()
         if data: data = data[0]
     return data
