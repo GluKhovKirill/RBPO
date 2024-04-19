@@ -142,11 +142,13 @@ https://secure-software.bmstu.ru/confirm.html?register=remote&uid={final_code}
         #         "qr": qr_fname}
         while True:
             try:
-                sender(mess, mail, qr_fname)
-                print("sent 2", mail)
-                if sender:
+                is_successful = sender(mess, mail, qr_fname)
+
+                if is_successful:
+                    print("sent 2", mail)
                     qr_flag_changer(username)
                 else:
+                    print("err sent 2", mail)
                     raise Exception("Timeout?")
                 break
             except Exception as err:
@@ -212,7 +214,7 @@ def sender(mess, mail, qr_fname=None) -> bool:
             print("sent")
     except smtplib.SMTPDataError as err:
         print("mail sending error:", err)
-        return None
+        return False
     return True
 
 
