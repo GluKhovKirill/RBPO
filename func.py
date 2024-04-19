@@ -17,12 +17,12 @@ from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 import time
 
-
-
 MAIL_CHECK_TIMER = None
 MAIL_CHECK_DELAY = 30
 DB_CHECK_TIMER = None
 DB_CHECK_DELAY = 5
+
+
 def qr_maker(tg_id):
     name = f'qr_{tg_id}.png'
     version, level, qr_name = amzqr.run(
@@ -64,8 +64,12 @@ def from_gmail_catcher():
                 form_id = info[0]
                 form_data = json.loads(info[1])
                 tg_id = form_data.get('Ваш Telegram', '').strip().lstrip('@')
-                for i in filter(lambda x: x and x.strip(), form_data['Какие дни вы планируете посетить?'].split('День')):
-                    gmail_catcher(form_id.strip(), form_data.get('Фамилия','').strip(), form_data.get('Имя', '').strip(), form_data.get('Отчество', '').strip(), i.strip(), form_data.get('Учебная группа / Организация', '').strip(), form_data.get('Ваша почта', '').strip(), tg_id)
+                for i in filter(lambda x: x and x.strip(),
+                                form_data['Какие дни вы планируете посетить?'].split('День')):
+                    gmail_catcher(form_id.strip(), form_data.get('Фамилия', '').strip(),
+                                  form_data.get('Имя', '').strip(), form_data.get('Отчество', '').strip(), i.strip(),
+                                  form_data.get('Учебная группа / Организация', '').strip(),
+                                  form_data.get('Ваша почта', '').strip(), tg_id)
     MAIL_CHECK_TIMER = Timer(MAIL_CHECK_DELAY, from_gmail_catcher)
     MAIL_CHECK_TIMER.start()
 
@@ -82,9 +86,8 @@ def quest_frame_checker():
     DB_CHECK_TIMER.start()
 
 
-
 def uid_generator():
-    ans=[]
+    ans = []
     all_data = sql_uid_cather()
     # print(all_data)
 
@@ -140,16 +143,17 @@ https://secure-software.bmstu.ru/confirm.html?register=remote&uid={final_code}
         while True:
             try:
                 sender(mess, mail, qr_fname)
-                print("sent 2",mail)
-                qr_flag_changer(username)
+                print("sent 2", mail)
+                if sender:
+                    qr_flag_changer(username)
+                else:
+                    raise Exception("Timeout?")
                 break
             except Exception as err:
                 print("ERR", err)
-                time.sleep(16*60)
-
+                time.sleep(16 * 60)
 
     return ans
-
 
 
 def sender(mess, mail, qr_fname=None) -> bool:
@@ -172,10 +176,8 @@ def sender(mess, mail, qr_fname=None) -> bool:
             with open('entry2.jpg', 'rb') as f:
                 img_data2 = f.read()
 
-            with open('qr_codes/'+qr_fname, 'rb') as f:
+            with open('qr_codes/' + qr_fname, 'rb') as f:
                 img_data3 = f.read()
-
-
 
             msg = MIMEMultipart("related")
 
@@ -190,7 +192,6 @@ def sender(mess, mail, qr_fname=None) -> bool:
             msg_image3 = MIMEImage(img_data3)
             msg_image3.add_header('Content-ID', 'qr.png')
             msg.attach(msg_image3)
-
 
             # image1 = MIMEImage(img_data1, name=os.path.basename('entry1.jpg'))
             # msg.attach(image1)
@@ -213,7 +214,6 @@ def sender(mess, mail, qr_fname=None) -> bool:
         print("mail sending error:", err)
         return None
     return True
-
 
 
 if __name__ == "__main__":
