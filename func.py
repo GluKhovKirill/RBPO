@@ -147,10 +147,11 @@ https://secure-software.bmstu.ru/confirm.html?register=remote&uid={final_code}
                 if is_successful:
                     print("sent 2", mail)
                     qr_flag_changer(username)
+                    break
                 else:
                     print("err sent 2", mail)
                     raise Exception("Timeout?")
-                break
+
             except Exception as err:
                 print("ERR", err)
                 time.sleep(16 * 60)
